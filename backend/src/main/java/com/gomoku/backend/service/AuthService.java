@@ -71,6 +71,7 @@ public class AuthService {
                 .enabled(false) // Chưa xác thực OTP
                 .elo(1000) // Điểm khởi đầu
                 .status(UserStatus.IDLE)
+                .avatar("https://api.dicebear.com/9.x/adventurer/svg?seed=" + request.getUsername())
                 .build();
 
         userRepository.save(user);

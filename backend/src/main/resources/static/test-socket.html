@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Gomoku Socket</title>
+    <!-- Thư viện SockJS và Stomp -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+    <h2>Test WebSocket Gomoku</h2>
+    <button onclick="connect()">1. Kết nối</button>
+    <button onclick="sendMove()">2. Gửi nước đi (5,5)</button>
+    <hr/>
+    <div id="status" style="color: red; font-weight: bold;">Chưa kết nối</div>
+    <h3>Tin nhắn nhận được từ Server:</h3>
+    <div id="messages"></div>
+
+    <script>
+        var stompClient = null;
+
+        function connect() {
+            // Kết nối vào endpoint backend
+            var socket = new SockJS('http://localhost:8080/ws-gomoku');
+            stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, function (frame) {
+                document.getElementById("status").innerHTML = "Đã kết nối thành công! (Xanh lè)";
+                document.getElementById("status").style.color = "green";
+                console.log('Connected: ' + frame);
+
+                // Đăng ký nghe kênh chung
+                stompClient.subscribe('/topic/game-progress', function (greeting) {
+                    showGreeting(JSON.parse(greeting.body));
+                });
+            });
+        }
+
+        function sendMove() {
+            // Gửi tin nhắn lên Server
+            stompClient.send("/app/move", {}, JSON.stringify({
+                'roomId': '101',
+                'x': 5,
+                'y': 5
+            }));
+        }
+
+        function showGreeting(message) {
+            var text = "Người chơi " + message.player + " vừa đánh vào ô (" + message.x + ", " + message.y + ")";
+            var p = document.createElement('p');
+            p.appendChild(document.createTextNode(text));
+            document.getElementById('messages').appendChild(p);
+        }
+    </script>
+</body>
+</html>

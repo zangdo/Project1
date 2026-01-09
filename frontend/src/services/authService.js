@@ -75,3 +75,20 @@ export const validateUsername = (username) => {
 export const validatePassword = (password) => {
     return password.length >= 6;
 };
+// Hàm đa năng: Truyền username vào thì lấy người đó, không truyền thì lấy chính mình
+export const getUserProfile = async (username = null) => {
+    try {
+        const token = localStorage.getItem('token');
+        
+        // Tạo params nếu có username
+        const params = username ? { username } : {};
+
+        const response = await axios.get(`${API_URL}/api/game/user`, {
+            headers: { Authorization: `Bearer ${token}` },
+            params: params
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response ? error.response.data : error.message;
+    }
+};

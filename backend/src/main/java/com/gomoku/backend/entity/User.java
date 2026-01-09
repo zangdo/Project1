@@ -45,6 +45,10 @@ public class User implements UserDetails {
     // Điểm Elo xếp hạng cờ
     private int elo;
 
+    private int wins;
+    private int losses;
+    private int draws;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -63,4 +67,14 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() { return this.enabled; } // Dùng trường enabled của mình
+
+    @Override
+    public String getUsername() {
+        return this.email; // <--- QUAN TRỌNG: Trả về Email thay vì username
+    }
+
+    // Thêm một hàm getter riêng cho cái tên hiển thị nếu cần
+    public String getRealUsername() {
+        return this.username;
+    }
 }
