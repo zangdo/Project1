@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_URL || 'https://project1-ogf1.onrender.com';
 
 // Hàm lấy token từ kho (để Backend biết ai đang gọi)
 const getAuthHeader = () => {

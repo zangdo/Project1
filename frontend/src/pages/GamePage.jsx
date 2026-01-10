@@ -7,8 +7,8 @@ import { setPlayerStatus} from '../services/gameService';
 import axios from 'axios';
 
 const BOARD_SIZE = 15;
-const SOCKET_URL = 'http://localhost:8080/ws-gomoku'; // Link backend
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const SOCKET_URL = 'https://project1-ogf1.onrender.com/ws-gomoku'; // Link backend
+const API_URL = import.meta.env.VITE_API_URL || 'https://project1-ogf1.onrender.com';
 const GamePage = () => {
     const navigate = useNavigate();
     
@@ -366,19 +366,19 @@ const GamePage = () => {
                 if (currentSymbol === 'X') {
                     setP1TimeLeft(prev => {
                         const newTime = Math.max(0, prev - delta);
-                        // Kiểm tra hết giờ cho mình (nếu mình là P1)
-                        if (newTime === 0 && isMyTurn && user?.username === p1UsernameRef.current) {
-                            handleSurrender();
-                        }
+                        // // Kiểm tra hết giờ cho mình (nếu mình là P1)
+                        // if (newTime === 0 && isMyTurn && user?.username === p1UsernameRef.current) {
+                        //     handleSurrender();
+                        // }
                         return newTime;
                     });
                 } else if (currentSymbol === 'O') {
                     setP2TimeLeft(prev => {
                         const newTime = Math.max(0, prev - delta);
-                        // Kiểm tra hết giờ cho mình (nếu mình là P2)
-                        if (newTime === 0 && isMyTurn && user?.username !== p1UsernameRef.current) {
-                            handleSurrender();
-                        }
+                        // // Kiểm tra hết giờ cho mình (nếu mình là P2)
+                        // if (newTime === 0 && isMyTurn && user?.username !== p1UsernameRef.current) {
+                        //     handleSurrender();
+                        // }
                         return newTime;
                     });
                 }

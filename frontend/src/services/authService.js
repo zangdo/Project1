@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Lấy link backend từ biến môi trường (hoặc mặc định localhost)
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_URL || 'https://project1-ogf1.onrender.com';
 
 export const register = async (userData) => {
     try {
