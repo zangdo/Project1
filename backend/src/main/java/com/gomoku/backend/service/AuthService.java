@@ -53,23 +53,51 @@ public class AuthService {
         }
     }
 
-    // 1. Đăng ký tài khoản
+    // 1. Đăng ký tài khoản (Đã fix logic tài khoản chưa kích hoạt)
     public String register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email đã tồn tại!");
-        }
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username đã tồn tại!");
+        
+        // Kiểm tra xem email đã có trong DB chưa
+        User existingUser = userRepository.findByEmail(request.getEmail()).orElse(null);
+
+        if (existingUser != null) {
+            // Nếu đã có VÀ đã kích hoạt -> Báo lỗi
+            if (existingUser.isEnabled()) {
+                throw new RuntimeException("Email đã tồn tại và đã được kích hoạt!");
+            } 
+            // Nếu đã có nhưng CHƯA kích hoạt -> Ghi đè (Cho phép đăng ký lại)
+            else {
+                // Update thông tin mới
+                existingUser.setUsername(request.getUsername());
+                existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
+                existingUser.setAvatar("https://api.dicebear.com/9.x/adventurer/svg?seed=" + request.getUsername());
+                
+                userRepository.save(existingUser);
+                
+                // Gửi lại OTP
+                sendOtp(request.getEmail());
+                return "Tài khoản chưa kích hoạt đã được cập nhật. Vui lòng check mail lấy OTP mới.";
+            }
         }
 
-        // Tạo user nhưng chưa kích hoạt (enabled = false)
+        // Kiểm tra Username trùng (chỉ check với các tài khoản ĐÃ kích hoạt để tránh chiếm dụng tên)
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+             // (Ở đây có thể logic phức tạp hơn: Nếu trùng username với nick chưa kích hoạt thì sao?
+             // Thôi đơn giản là cứ trùng thì báo lỗi cho an toàn)
+             // Hoặc check kỹ:
+             User u = userRepository.findByUsername(request.getUsername()).get();
+             if (u.isEnabled()) {
+                 throw new RuntimeException("Username đã tồn tại!");
+             }
+        }
+
+        // Tạo user mới (như cũ)
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role("USER")
-                .enabled(false) // Chưa xác thực OTP
-                .elo(1000) // Điểm khởi đầu
+                .enabled(false) 
+                .elo(1000) 
                 .status(UserStatus.IDLE)
                 .avatar("https://api.dicebear.com/9.x/adventurer/svg?seed=" + request.getUsername())
                 .build();
@@ -92,6 +120,7 @@ public class AuthService {
 
         // Gửi email
         SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("zangdo20052014@gmail.com");
         message.setTo(email);
         message.setSubject("Mã xác thực Gomoku Game");
         message.setText("Mã OTP của bạn là: " + otp + "\nMã này có hiệu lực trong 2 phút.");
