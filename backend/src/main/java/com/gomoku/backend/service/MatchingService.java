@@ -108,7 +108,7 @@ public class MatchingService {
         room.setRoomId(roomId);
         room.setPlayer1(p1.getRealUsername()); 
         room.setPlayer2(p2.getRealUsername());
-        room.setReadyDeadline(System.currentTimeMillis() + 12000); // 12 giây
+        room.setReadyDeadline(System.currentTimeMillis() + 20000); // 12 giây
         GameSocketController.rooms.put(roomId, room);
 
         System.out.println("Đã ghép: " + p1.getRealUsername() + " vs " + p2.getRealUsername() + " tại phòng " + roomId);
