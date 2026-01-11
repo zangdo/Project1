@@ -356,6 +356,8 @@ const GamePage = () => {
             setIsMyReady(false);
             setIsOpReady(false);
             setCountdown(10);
+
+            setShowLeaderboard(false);
         }
     }, [gameState]);
 
