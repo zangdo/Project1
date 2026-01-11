@@ -4,6 +4,8 @@ import SockJS from 'sockjs-client/dist/sockjs'; // npm install sockjs-client
 import { Stomp } from '@stomp/stompjs';         // npm install @stomp/stompjs
 import { logout, getUserProfile } from '../services/authService';
 import { setPlayerStatus} from '../services/gameService';
+import LeaderboardModal from '../components/LeaderboardModal'; // Import
+import { getLeaderboard } from '../services/gameService'; // Import
 import axios from 'axios';
 
 const BOARD_SIZE = 15;
@@ -38,6 +40,15 @@ const GamePage = () => {
     const currentTurnSymbolRef = useRef(null); // Để Interval luôn đọc được Symbol mới nhất
     const lastTickRef = useRef(Date.now());
     const [isInitialLoading, setIsInitialLoading] = useState(true);
+
+    const [showLeaderboard, setShowLeaderboard] = useState(false);
+    const [leaderboardData, setLeaderboardData] = useState([]);
+
+    const handleOpenLeaderboard = async () => {
+        const data = await getLeaderboard();
+        setLeaderboardData(data);
+        setShowLeaderboard(true);
+    };
     // 1. KẾT NỐI SOCKET & LẤY INFO KHI VÀO TRANG
    useEffect(() => {
         const init = async () => {
@@ -463,6 +474,14 @@ const GamePage = () => {
                         </button>
 
                         <button 
+                            onClick={handleOpenLeaderboard} 
+                            style={{...styles.btn, background: '#f57c00'}}
+                            disabled={gameState === "MATCHING"}
+                        >
+                            🏆 Bảng Phong Thần
+                        </button>
+
+                        <button 
                             onClick={handleLogout} 
                             style={{
                                 ...styles.btn, 
@@ -482,6 +501,11 @@ const GamePage = () => {
                         )}
                     </div>
                 </div>
+                <LeaderboardModal 
+                    isOpen={showLeaderboard} 
+                    onClose={() => setShowLeaderboard(false)} 
+                    data={leaderboardData} 
+                />
             </div>
         );
     }

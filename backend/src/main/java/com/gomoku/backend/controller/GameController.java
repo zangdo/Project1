@@ -14,7 +14,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
+import org.springframework.data.domain.PageRequest;
 import com.gomoku.backend.controller.GameSocketController;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/game")
@@ -136,5 +138,24 @@ public class GameController {
             }
         }
         return ResponseEntity.noContent().build(); // Không có trận nào
+    }
+
+    @GetMapping("/leaderboard")
+    public ResponseEntity<List<UserResponse>> getLeaderboard() {
+        // Lấy Top 10 cao thủ
+        List<User> topUsers = userRepository.findAllByOrderByEloDesc(PageRequest.of(0, 10));
+        
+        List<UserResponse> response = topUsers.stream().map(u -> UserResponse.builder()
+                .username(u.getRealUsername()) // Tên hiển thị
+                // .email() -> Không trả về email để bảo mật
+                .elo(u.getElo())
+                .wins(u.getWins())
+                .losses(u.getLosses())
+                .draws(u.getDraws())
+                .avatar(u.getAvatar() != null ? u.getAvatar() : 
+                        "https://api.dicebear.com/9.x/adventurer/svg?seed=" + u.getRealUsername())
+                .build()).toList();
+
+        return ResponseEntity.ok(response);
     }
 }
